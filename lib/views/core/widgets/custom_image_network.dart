@@ -5,15 +5,18 @@ class CustomImageNetwork extends StatelessWidget {
   final String _path;
   final double? _width;
   final double? _height;
+  final VoidCallback? _onTap;
 
   const CustomImageNetwork(
     String path, {
     super.key,
     double? width,
     double? height,
+    VoidCallback? onTap,
   }) : _path = path,
        _width = width,
-       _height = height;
+       _height = height,
+       _onTap = onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,10 @@ class CustomImageNetwork extends StatelessWidget {
           );
         }
 
-        return FadeIn(child: child);
+        return GestureDetector(
+          onTap: _onTap,
+          child: FadeIn(child: child),
+        );
       },
     );
   }

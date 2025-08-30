@@ -1,8 +1,9 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:animate_do/animate_do.dart';
+
 import 'package:cinemapedia/data/facades/human_formats.dart';
 import 'package:cinemapedia/views/core/widgets/widgets.dart';
-import 'package:flutter/material.dart';
-
 import 'package:cinemapedia/domain/entities/movie.dart';
 
 class MovieHorizontalListview extends StatefulWidget {
@@ -23,11 +24,11 @@ class MovieHorizontalListview extends StatefulWidget {
        _loadNextPage = loadNextPage;
 
   @override
-  State<MovieHorizontalListview> createState() => _MovieHorizontalListviewState();
+  State<MovieHorizontalListview> createState() =>
+      _MovieHorizontalListviewState();
 }
 
 class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
-
   final _scrollController = ScrollController();
 
   @override
@@ -36,8 +37,9 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
     _scrollController.addListener(() {
       if (widget._loadNextPage == null) return;
 
-      if ((_scrollController.position.pixels + 200) >= _scrollController.position.maxScrollExtent) {
-        widget._loadNextPage!();  
+      if ((_scrollController.position.pixels + 200) >=
+          _scrollController.position.maxScrollExtent) {
+        widget._loadNextPage!();
       }
     });
   }
@@ -64,7 +66,12 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
               physics: BouncingScrollPhysics(),
               itemCount: widget._movies.length,
               itemBuilder: (context, index) {
-                return FadeInRight(child: _Slide(widget._movies[index]));
+                return FadeInRight(
+                  child: _Slide(
+                    widget._movies[index],
+                    key: ValueKey(widget._movies[index].id),
+                  ),
+                );
               },
             ),
           ),
@@ -77,11 +84,13 @@ class _MovieHorizontalListviewState extends State<MovieHorizontalListview> {
 class _Slide extends StatelessWidget {
   final Movie _movie;
 
-  const _Slide(this._movie);
+  const _Slide(this._movie, {super.key});
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme(:titleSmall, :bodyMedium, :bodySmall) = Theme.of(context).textTheme;
+    final TextTheme(:titleSmall, :bodyMedium, :bodySmall) = Theme.of(
+      context,
+    ).textTheme;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
@@ -94,7 +103,11 @@ class _Slide extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               // child: Image.network(_movie.posterPath, width: 150, loadingBuilder: ,),
-              child: CustomImageNetwork(_movie.posterPath, width: 150),
+              child: CustomImageNetwork(
+                _movie.posterPath,
+                width: 150,
+                onTap: () => context.push('/movie/${_movie.id}'),
+              ),
             ),
           ),
 
@@ -111,16 +124,13 @@ class _Slide extends StatelessWidget {
             child: Row(
               children: [
                 Icon(Icons.star_half_outlined, color: Colors.yellow.shade800),
-                SizedBox(width: 3,),
+                SizedBox(width: 3),
                 Text(
                   '${_movie.voteAverage}',
                   style: bodyMedium?.copyWith(color: Colors.yellow.shade800),
                 ),
                 Spacer(),
-                Text(
-                  HumanFormats.number(_movie.popularity),
-                  style: bodySmall,
-                ),
+                Text(HumanFormats.number(_movie.popularity), style: bodySmall),
               ],
             ),
           ),

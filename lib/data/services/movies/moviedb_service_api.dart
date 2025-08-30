@@ -1,24 +1,15 @@
-import 'package:dio/dio.dart';
-
-import 'package:cinemapedia/data/services/movies_datasource.dart';
+import 'package:cinemapedia/data/facades/http_client.dart';
+import 'package:cinemapedia/data/models/moviedb/movie_details_api.dart';
+import 'package:cinemapedia/data/services/movies/movies_datasource.dart';
 import 'package:cinemapedia/data/models/moviedb/movie_moviedb.dart';
 import 'package:cinemapedia/data/models/moviedb/moviedb_response.dart';
-import 'package:cinemapedia/config/constants/environment.dart';
 
 class MoviedbService extends MovieDatasource {
-  final dio = Dio(
-    BaseOptions(
-      baseUrl: 'https://api.themoviedb.org/3',
-      queryParameters: {
-        'api_key': Environment.theMovieDBKey,
-        'language': 'es-MX',
-      },
-    ),
-  );
+  final httpClient = DioHttpClient();
 
   @override
   Future<List<MovieMovieDB>> getNowPlaying({int page = 1}) async {
-    final response = await dio.get('/movie/now_playing', queryParameters: {
+    final response = await httpClient.get('/movie/now_playing', queryParameters: {
       'page': page,
     });
     final MovieDbResponse movieDBResponse = MovieDbResponse.fromJson(
@@ -30,7 +21,7 @@ class MoviedbService extends MovieDatasource {
   
   @override
   Future<List<MovieMovieDB>> getPopular({int page = 1}) async {
-    final response = await dio.get('/movie/popular', queryParameters: {
+    final response = await httpClient.get('/movie/popular', queryParameters: {
       'page': page,
     });
     final MovieDbResponse movieDBResponse = MovieDbResponse.fromJson(
@@ -42,7 +33,7 @@ class MoviedbService extends MovieDatasource {
   
   @override
   Future<List<MovieMovieDB>> getTopRated({int page = 1}) async {
-    final response = await dio.get('/movie/top_rated', queryParameters: {
+    final response = await httpClient.get('/movie/top_rated', queryParameters: {
       'page': page,
     });
     final MovieDbResponse movieDBResponse = MovieDbResponse.fromJson(
@@ -54,7 +45,7 @@ class MoviedbService extends MovieDatasource {
   
   @override
   Future<List<MovieMovieDB>> getUpcoming({int page = 1}) async {
-    final response = await dio.get('/movie/upcoming', queryParameters: {
+    final response = await httpClient.get('/movie/upcoming', queryParameters: {
       'page': page,
     });
     final MovieDbResponse movieDBResponse = MovieDbResponse.fromJson(
@@ -62,5 +53,15 @@ class MoviedbService extends MovieDatasource {
     );
 
     return movieDBResponse.results;
+  }
+  
+  @override
+  Future<MovieDetailsApi> getMovieById(String id) async {
+    final response = await httpClient.get('/movie/$id');
+    final MovieDetailsApi movieDBResponse = MovieDetailsApi.fromJson(
+      response.data,
+    );
+
+    return movieDBResponse;
   }
 }
